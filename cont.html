@@ -49,7 +49,7 @@
                     data: []
                 };
 
-                $.get('/github/cont', null, function(data) {
+                $.get('/cont', null, function(data) {
                     var features = JSON.parse(data);
                     for (var i = 0, l = features.length; i<l; i++) {
                         var feature = features[i];
