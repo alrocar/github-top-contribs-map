@@ -2,4 +2,4 @@ An interactive map with the location of the top contributors of Github (see http
 
 https://alrocar.github.io/github-top-contribs-map/cont.html
 
-[![](https://github.com/alrocar/github-top-contribs-map/contrib.gif)](https://alrocar.github.io/github-top-contribs-map/cont.html)
+[![](https://github.com/alrocar/github-top-contribs-map/blob/master/contrib.gif)](https://alrocar.github.io/github-top-contribs-map/cont.html)
