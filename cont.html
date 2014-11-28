@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.js"></script>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <link rel="stylesheet" href="./markercluster.css" />
+        <script type="text/javascript" src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        <script type="text/javascript" src="./heatmap.js"></script>
+        <script type="text/javascript" src="./leaflet.heatmap.js"></script>
+        <script type="text/javascript" src="./markercluster.js"></script>
+        <style>
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            html, body, #map {
+                height: 100%;
+            }
+        </style>
+        <script type="text/javascript">
+            var features = [];
+            $(document).ready(function() {
+                var baseLayer = L.tileLayer('http://{s}.tiles.mapbox.com/v3/alrocar.k5iabjp4/{z}/{x}/{y}.png', {
+                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                    maxZoom: 18
+                });
+
+                var cfg = {
+                    "radius": 3,
+                    "maxOpacity": .8, 
+                    "scaleRadius": true, 
+                    "useLocalExtrema": true,
+                    latField: 'lat',
+                    lngField: 'lng',
+                    valueField: 'count'
+                };
+
+                var heatmapLayer = new HeatmapOverlay(cfg);
+
+                var map = L.map('map', {
+                    layers: [baseLayer, heatmapLayer]
+                }).setView([0, 0], 3);
+
+                var markers = new L.MarkerClusterGroup();
+                map.addLayer(markers);
+
+                var heatmapData = {
+                    max: 8,
+                    data: []
+                };
+
+                $.get('/github/cont', null, function(data) {
+                    var features = JSON.parse(data);
+                    for (var i = 0, l = features.length; i<l; i++) {
+                        var feature = features[i];
+                        heatmapData.data.push({
+                            lng: feature.geometry.coordinates[0],
+                            lat: feature.geometry.coordinates[1],
+                            count: feature.properties.contribs / 100
+                        });
+
+                        var geoJsonLayer = L.geoJson(feature, {
+                            onEachFeature: function (feature, layer) {
+                                if (feature.properties && feature.properties.usr) {
+                                    var popup = "<a href='" + feature.properties.href + "' target='_blank'>" + feature.properties.usr + "</a>";
+                                    popup += "</br>";
+                                    popup += "Contributions: " + feature.properties.contribs;
+                                    popup += "</br>";
+                                    popup += "Language: " + feature.properties.language;
+                                    popup += "</br>";
+                                    popup += "Location: " + feature.properties.location;
+                                    layer.bindPopup(popup);
+                                }
+                            }
+                        });
+                        markers.addLayer(geoJsonLayer);
+                        heatmapLayer.setData(heatmapData);
+                    }                   
+                });
+            });
+        </script>
+    </head>
+    <body>
+         <div id="map"></div>
+    </body>
+</html>
