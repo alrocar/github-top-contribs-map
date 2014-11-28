@@ -44,7 +44,7 @@
                 var markers = new L.MarkerClusterGroup();
                 map.addLayer(markers);
 
-                $.get('/top', null, function(data) {
+                $.get('./top', null, function(data) {
                     var $top = $(data);
                     var $table = $top.find('table');
                     var heatmapData = {
